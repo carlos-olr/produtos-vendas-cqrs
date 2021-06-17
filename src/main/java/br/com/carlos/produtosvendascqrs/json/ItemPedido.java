@@ -2,7 +2,8 @@ package br.com.carlos.produtosvendascqrs.json;
 
 
 import java.io.Serializable;
-import java.math.BigDecimal;
+
+import javax.persistence.Id;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,9 +20,9 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProdutoJson implements Serializable {
+public class ItemPedido implements Serializable {
 
-    private String nome;
-    private BigDecimal preco;
+    private String produtoId;
+    private Integer quantidade;
 
 }

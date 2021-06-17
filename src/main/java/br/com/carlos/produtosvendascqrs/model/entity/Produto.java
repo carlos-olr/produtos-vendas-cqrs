@@ -4,6 +4,7 @@ package br.com.carlos.produtosvendascqrs.model.entity;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
@@ -25,7 +26,11 @@ public class Produto implements Serializable {
 
     @Id
     private String id;
+
+    @Column(nullable = false)
     private String nome;
+
+    @Column(nullable = false)
     private BigDecimal preco;
 
 }
