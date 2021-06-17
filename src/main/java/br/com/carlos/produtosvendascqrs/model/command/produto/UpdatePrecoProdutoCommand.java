@@ -25,7 +25,6 @@ public class UpdatePrecoProdutoCommand implements Serializable {
 
     @TargetAggregateIdentifier
     private String id;
-    private String nome;
     private BigDecimal preco;
 
 }

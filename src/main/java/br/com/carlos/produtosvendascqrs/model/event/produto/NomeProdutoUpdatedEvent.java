@@ -23,10 +23,10 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class PrecoProdutoUpdatedEvent extends EventoIdentificavel implements Serializable {
+public class NomeProdutoUpdatedEvent extends EventoIdentificavel implements Serializable {
 
     @TargetAggregateIdentifier
     private String id;
-    private BigDecimal preco;
+    private String nome;
 
 }
