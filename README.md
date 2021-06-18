@@ -19,10 +19,8 @@ mensagens e eventos
 A execução do sistema é feita de através de scripts encontrado no próprio repositório.
 </p>
 
-<p>
 **OBS**: O projeto foi criado e testado em Ubuntu, talvez seja necessária alguma customização para execução 
 em outras plataformas.
-</p>
  
 
 ### Pré-requisitos (Sistema)
