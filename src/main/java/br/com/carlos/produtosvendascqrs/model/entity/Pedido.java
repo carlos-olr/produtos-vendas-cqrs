@@ -33,6 +33,6 @@ public class Pedido implements Serializable {
 
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @OneToMany(cascade = { CascadeType.ALL }, mappedBy = "pedido", fetch = FetchType.EAGER)
-    private List<PedidoProduto> itensPedido;
+    private List<ItemPedido> itensPedido;
 
 }

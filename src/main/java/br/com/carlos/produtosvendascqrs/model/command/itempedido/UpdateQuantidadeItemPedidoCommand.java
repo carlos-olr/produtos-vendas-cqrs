@@ -1,7 +1,9 @@
-package br.com.carlos.produtosvendascqrs.json;
+package br.com.carlos.produtosvendascqrs.model.command.itempedido;
 
 
 import java.io.Serializable;
+
+import org.axonframework.modelling.command.TargetAggregateIdentifier;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,14 +15,15 @@ import lombok.ToString;
 /**
  * @author carlos.oliveira
  */
-@Setter
 @Getter
+@Setter
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class ItemPedido implements Serializable {
+public class UpdateQuantidadeItemPedidoCommand implements Serializable {
 
-    private String produtoId;
+    @TargetAggregateIdentifier
+    private String id;
     private Integer quantidade;
 
 }

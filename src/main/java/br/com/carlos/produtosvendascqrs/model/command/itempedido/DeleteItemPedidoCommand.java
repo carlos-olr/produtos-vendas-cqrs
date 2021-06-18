@@ -1,11 +1,9 @@
-package br.com.carlos.produtosvendascqrs.model.command.pedido;
+package br.com.carlos.produtosvendascqrs.model.command.itempedido;
 
 
 import java.io.Serializable;
 
 import org.axonframework.modelling.command.TargetAggregateIdentifier;
-
-import br.com.carlos.produtosvendascqrs.json.ItemPedidoJson;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,10 +20,9 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class AddItemPedidoToPedidoCommand implements Serializable {
+public class DeleteItemPedidoCommand implements Serializable {
 
     @TargetAggregateIdentifier
     private String id;
-    private ItemPedidoJson item;
 
 }

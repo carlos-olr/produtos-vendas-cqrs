@@ -10,15 +10,15 @@ import org.axonframework.eventhandling.EventHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import br.com.carlos.produtosvendascqrs.json.ItemPedido;
+import br.com.carlos.produtosvendascqrs.json.ItemPedidoJson;
 import br.com.carlos.produtosvendascqrs.model.entity.GeradorId;
 import br.com.carlos.produtosvendascqrs.model.entity.Pedido;
-import br.com.carlos.produtosvendascqrs.model.entity.PedidoProduto;
+import br.com.carlos.produtosvendascqrs.model.entity.ItemPedido;
 import br.com.carlos.produtosvendascqrs.model.entity.Produto;
 import br.com.carlos.produtosvendascqrs.model.event.EventoIdentificavel;
 import br.com.carlos.produtosvendascqrs.model.event.pedido.ItemPedidoAddedToPedidoEvent;
 import br.com.carlos.produtosvendascqrs.model.event.pedido.PedidoAddedEvent;
-import br.com.carlos.produtosvendascqrs.repository.PedidoProdutoRepository;
+import br.com.carlos.produtosvendascqrs.repository.ItemPedidoRepository;
 import br.com.carlos.produtosvendascqrs.repository.PedidoRepository;
 import br.com.carlos.produtosvendascqrs.repository.ProdutoRepository;
 
@@ -38,7 +38,7 @@ public class PedidoProcessor {
     @Autowired
     private ProdutoRepository produtoRepository;
     @Autowired
-    private PedidoProdutoRepository pedidoProdutoRepository;
+    private ItemPedidoRepository itemPedidoRepository;
 
     @EventHandler
     public void on(PedidoAddedEvent evento) {
@@ -59,47 +59,29 @@ public class PedidoProcessor {
 
     @EventHandler
     public void on(ItemPedidoAddedToPedidoEvent evento) {
-        ItemPedido itemEvento = evento.getItem();
+        ItemPedidoJson itemEvento = evento.getItem();
         this.findPedidoAndDoStuff(evento, (pedido -> {
-            PedidoProduto pedidoProduto = this.criarPedidoProduto(pedido, itemEvento);
+            ItemPedido itemPedido = this.criarPedidoProduto(pedido, itemEvento);
 
-            this.pedidoProdutoRepository.save(pedidoProduto);
+            this.itemPedidoRepository.save(itemPedido);
         }));
     }
 
-    //    @EventHandler
-    //    public void on(PrecoProdutoUpdatedEvent evento) {
-    //        this.findProdutoAndDoStuff(evento, (produto) -> {
-    //            produto.setPreco(evento.getPreco());
-    //            this.produtoRepository.save(produto);
-    //            log.info("um produto teve o preço atualizado {}", produto);
-    //        });
-    //    }
-    //
-    //    @EventHandler
-    //    public void on(NomeProdutoUpdatedEvent evento) {
-    //        this.findProdutoAndDoStuff(evento, (produto) -> {
-    //            produto.setNome(evento.getNome());
-    //            this.produtoRepository.save(produto);
-    //            log.info("um produto teve o nome atualizado {}", produto);
-    //        });
-    //    }
+    private ItemPedido criarPedidoProduto(Pedido pedido, ItemPedidoJson itemPedidoJson) {
+        String id = GeradorId.newId("itemPedido");
+        ItemPedido itemPedido = new ItemPedido();
+        itemPedido.setId(id);
 
-    private PedidoProduto criarPedidoProduto(Pedido pedido, ItemPedido itemPedido) {
-        String id = GeradorId.newId("pedidoProduto");
-        PedidoProduto pedidoProduto = new PedidoProduto();
-        pedidoProduto.setId(id);
+        Produto produto = this.produtoRepository.findById(itemPedidoJson.getProdutoId()).orElseThrow();
+        itemPedido.setProduto(produto);
 
-        Produto produto = this.produtoRepository.findById(itemPedido.getProdutoId()).orElseThrow();
-        pedidoProduto.setProduto(produto);
+        itemPedido.setQuantidade(itemPedidoJson.getQuantidade());
+        itemPedido.setPrecoUnitario(produto.getPreco());
+        itemPedido.setPrecoTotal(produto.getPreco().multiply(new BigDecimal(itemPedidoJson.getQuantidade())));
 
-        pedidoProduto.setQuantidade(itemPedido.getQuantidade());
-        pedidoProduto.setPrecoUnitario(produto.getPreco());
-        pedidoProduto.setPrecoTotal(produto.getPreco().multiply(new BigDecimal(itemPedido.getQuantidade())));
+        itemPedido.setPedido(pedido);
 
-        pedidoProduto.setPedido(pedido);
-
-        return pedidoProduto;
+        return itemPedido;
     }
 
     private void findPedidoAndDoStuff(EventoIdentificavel evento, Consumer<Pedido> funcao) {

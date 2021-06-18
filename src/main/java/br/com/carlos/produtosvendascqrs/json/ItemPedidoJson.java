@@ -2,7 +2,6 @@ package br.com.carlos.produtosvendascqrs.json;
 
 
 import java.io.Serializable;
-import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,8 +18,9 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class PedidoJson implements Serializable {
+public class ItemPedidoJson implements Serializable {
 
-    private List<ItemPedidoJson> itens;
+    private String produtoId;
+    private Integer quantidade;
 
 }

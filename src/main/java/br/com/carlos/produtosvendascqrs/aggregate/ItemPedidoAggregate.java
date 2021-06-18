@@ -3,22 +3,19 @@ package br.com.carlos.produtosvendascqrs.aggregate;
 
 import static org.axonframework.modelling.command.AggregateLifecycle.apply;
 import static org.springframework.util.Assert.isTrue;
-import static org.springframework.util.Assert.notEmpty;
 import static org.springframework.util.Assert.notNull;
 
 import java.io.Serializable;
-import java.util.List;
 
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
 import org.axonframework.spring.stereotype.Aggregate;
 
-import br.com.carlos.produtosvendascqrs.json.ItemPedidoJson;
-import br.com.carlos.produtosvendascqrs.model.command.pedido.AddItemPedidoToPedidoCommand;
-import br.com.carlos.produtosvendascqrs.model.command.pedido.AddPedidoCommand;
-import br.com.carlos.produtosvendascqrs.model.event.pedido.ItemPedidoAddedToPedidoEvent;
-import br.com.carlos.produtosvendascqrs.model.event.pedido.PedidoAddedEvent;
+import br.com.carlos.produtosvendascqrs.model.command.itempedido.DeleteItemPedidoCommand;
+import br.com.carlos.produtosvendascqrs.model.command.itempedido.UpdateQuantidadeItemPedidoCommand;
+import br.com.carlos.produtosvendascqrs.model.event.itempedido.ItemPedidoDeletedEvent;
+import br.com.carlos.produtosvendascqrs.model.event.itempedido.QuantidadeItemPedidoUpdatedEvent;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -36,33 +33,28 @@ import lombok.extern.slf4j.Slf4j;
 @Aggregate
 @NoArgsConstructor
 @AllArgsConstructor
-public class PedidoAggregate implements Serializable {
+public class ItemPedidoAggregate implements Serializable {
 
     @AggregateIdentifier
     private String id;
-    private List<ItemPedidoJson> itens;
-    private ItemPedidoJson item;
+    private Integer quantidade;
 
     @CommandHandler
-    public PedidoAggregate(AddPedidoCommand comando) {
+    public ItemPedidoAggregate(UpdateQuantidadeItemPedidoCommand comando) {
         log.info("Handling {} command: {}", comando.getClass().getSimpleName(), comando);
         notNull(comando.getId(), "Id não pode ser null");
-        notEmpty(comando.getItens(), "Lista de Produtos não pode estar vazia ou nula");
-        isTrue(comando.getItens().stream().anyMatch(
-                itemPedido -> (itemPedido.getQuantidade() != null && itemPedido.getQuantidade() > 0) && (
-                        itemPedido.getProdutoId() != null)),
-                "A quantidade não pode estar vazia e o produto deve ser informado");
+        isTrue(comando.getQuantidade() != null && comando.getQuantidade() > 0, "A quantidade não pode estar vazia");
 
-        apply(new PedidoAddedEvent(comando.getId(), comando.getItens()));
+        apply(new QuantidadeItemPedidoUpdatedEvent(comando.getId(), comando.getQuantidade()));
         log.info("Done handling {} command: {}", comando.getClass().getSimpleName(), comando);
     }
 
     @EventSourcingHandler
-    public void on(PedidoAddedEvent event) {
+    public void on(QuantidadeItemPedidoUpdatedEvent event) {
         log.info("Handling {} event: {}", event.getClass().getSimpleName(), event);
 
         this.id = event.getId();
-        this.itens = event.getItens();
+        this.quantidade = event.getQuantidade();
 
         log.info("Done handling {} event: {}", event.getClass().getSimpleName(), event);
     }
@@ -70,26 +62,23 @@ public class PedidoAggregate implements Serializable {
     //-------------------------------------------------------------------------------------------------------//
 
     @CommandHandler
-    public PedidoAggregate(AddItemPedidoToPedidoCommand comando) {
+    public ItemPedidoAggregate(DeleteItemPedidoCommand comando) {
         log.info("Handling {} command: {}", comando.getClass().getSimpleName(), comando);
         notNull(comando.getId(), "Id não pode ser null");
-        ItemPedidoJson item = comando.getItem();
-        notNull(item, "Item Pedido não pode ser null");
-        notNull(item.getProdutoId(), "Produto Id não pode ser null");
-        isTrue(item.getQuantidade() != null && item.getQuantidade() > 0, "A quantidade não pode estar vazia");
 
-        apply(new ItemPedidoAddedToPedidoEvent(comando.getId(), comando.getItem()));
+        apply(new ItemPedidoDeletedEvent(comando.getId()));
         log.info("Done handling {} command: {}", comando.getClass().getSimpleName(), comando);
     }
 
     @EventSourcingHandler
-    public void on(ItemPedidoAddedToPedidoEvent event) {
+    public void on(ItemPedidoDeletedEvent event) {
         log.info("Handling {} event: {}", event.getClass().getSimpleName(), event);
 
         this.id = event.getId();
-        this.item = event.getItem();
 
         log.info("Done handling {} event: {}", event.getClass().getSimpleName(), event);
     }
+
+    //-------------------------------------------------------------------------------------------------------//
 
 }

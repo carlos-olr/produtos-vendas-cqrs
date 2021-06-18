@@ -18,19 +18,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.com.carlos.produtosvendascqrs.json.ItemPedido;
+import br.com.carlos.produtosvendascqrs.json.ItemPedidoJson;
 import br.com.carlos.produtosvendascqrs.json.PedidoJson;
-import br.com.carlos.produtosvendascqrs.json.ProdutoJson;
 import br.com.carlos.produtosvendascqrs.model.command.pedido.AddItemPedidoToPedidoCommand;
 import br.com.carlos.produtosvendascqrs.model.command.pedido.AddPedidoCommand;
-import br.com.carlos.produtosvendascqrs.model.command.produto.AddProdutoCommand;
-import br.com.carlos.produtosvendascqrs.model.command.produto.UpdateNomeProdutoCommand;
-import br.com.carlos.produtosvendascqrs.model.command.produto.UpdatePrecoProdutoCommand;
 import br.com.carlos.produtosvendascqrs.model.entity.GeradorId;
 import br.com.carlos.produtosvendascqrs.model.entity.Pedido;
-import br.com.carlos.produtosvendascqrs.model.entity.Produto;
 import br.com.carlos.produtosvendascqrs.repository.PedidoRepository;
-import br.com.carlos.produtosvendascqrs.repository.ProdutoRepository;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -60,21 +54,12 @@ public class PedidoController {
     }
 
     @PostMapping("/{id}/item")
-    public String adicionarItemPedido(@PathVariable String id, @RequestBody ItemPedido json) {
+    public String adicionarItemPedido(@PathVariable String id, @RequestBody ItemPedidoJson json) {
         var command = new AddItemPedidoToPedidoCommand(id, json);
         log.info("Executing command: {}", command);
         this.commandGateway.send(command);
         return id;
     }
-//
-//    @PostMapping("/{id}/nome")
-//    public String atualizarNome(@PathVariable String id, @RequestBody ProdutoJson json) {
-//        var command = new UpdateNomeProdutoCommand(id, json.getNome());
-//        log.info("Executing command: {}", command);
-//        this.commandGateway.send(command);
-//        return id;
-//    }
-//
 
     @ResponseStatus(HttpStatus.OK)
     @Transactional(readOnly = true)
