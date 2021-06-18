@@ -1,0 +1,81 @@
+version: "3"
+services:
+  # rabbitmq**************************************
+  rabbitmq:
+    image: rabbitmq:3-management
+    network_mode: bridge
+    container_name: rabbitmq
+    hostname: rabbitmq
+    expose:
+      - 4369
+      - 5671
+      - 5672
+      - 25672
+      - 15671
+      - 15672
+    ports:
+      - 4369:4369
+      - 5671:5671
+      - 5672:5672
+      - 25672:25672
+      - 15671:15671
+      - 15672:15672
+    healthcheck:
+        test: [ "CMD", "curl", "-f", "http://rabbitmq:15672" ]
+        interval: 30s
+        timeout: 10s
+        retries: 5
+
+  # axonserver*************************************
+  axonserver:
+    image: axoniq/axonserver
+    network_mode: bridge
+    container_name: axonserver
+    expose:
+      - 8024
+      - 8124
+      - 8224
+    ports:
+      - 8024:8024
+      - 8124:8124
+      - 8224:8224
+    depends_on:
+      - rabbitmq
+    links:
+      - rabbitmq
+
+  # Banco*****************************************
+  postgres-produtos-vendas-cqrs:
+    image: postgres:latest
+    network_mode: bridge
+    container_name: postgres-produtos-vendas-cqrs
+    expose:
+      - 5432
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=postgres-produtos-vendas-cqrs
+
+  # APP*****************************************
+  springbootapp:
+    image: produtos-vendas-cqrs-app:latest
+    network_mode: bridge
+    container_name: produtos-vendas-cqrs-app
+    expose:
+      - 8081
+    ports:
+      - 8081:8081
+    depends_on:
+      - rabbitmq
+      - axonserver
+      - postgres-produtos-vendas-cqrs
+    links:
+      - rabbitmq
+      - axonserver
+      - postgres-produtos-vendas-cqrs
+    environment:
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - AXONSERVER_HOST=axonserver
+    restart: on-failure

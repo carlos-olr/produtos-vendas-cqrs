@@ -3,7 +3,7 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/todo-list
+    url: jdbc:postgresql://postgres-produtos-vendas-cqrs:5432/postgres-produtos-vendas-cqrs
     username: postgres
     password: admin
   jpa:
@@ -14,6 +14,8 @@ spring:
       ddl-auto: create-drop
 
 axon:
+  axonserver:
+    servers: axonserver:8124
   server:
     port: 8081
   amqp:
